@@ -48,9 +48,16 @@ class DiscretizedRandomAgent(object):
   }
 
   ACTION_LIST = ACTIONS.values()
+  
+  def __init__(self):
+      self.rewards = 0
+      
+  def reset(self):
+      pass
 
   def step(self, unused_reward, unused_image):
     """Gets an image state and a reward, returns an action."""
+    self.rewards += unused_reward
     return random.choice(DiscretizedRandomAgent.ACTION_LIST)
 
 
@@ -151,23 +158,28 @@ def run(length, width, height, fps, level):
   # Starts the random spring agent. As a simpler alternative, we could also
   # use DiscretizedRandomAgent().
   agent = SpringAgent(env.action_spec())
+  #agent = DiscretizedRandomAgent()
 
   reward = 0
-
   for _ in xrange(length):
     if not env.is_running():
       print('Environment stopped early')
       env.reset()
       agent.reset()
     obs = env.observations()
-    action = agent.step(reward, obs['RGB_INTERLACED'])
+    pixels = obs['RGB_INTERLACED']
+    #print(np.shape(pixels))
+    action = agent.step(reward, pixels)
+    print(action)
     reward = env.step(action, num_steps=1)
 
   print('Finished after %i steps. Total reward received is %f'
         % (length, agent.rewards))
 
 
+
 if __name__ == '__main__':
+  print("Hello")
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument('--length', type=int, default=1000,
                       help='Number of steps to run the agent')
